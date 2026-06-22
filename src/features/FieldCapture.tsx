@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Modal,
   TextInput,
+  ListRenderItem,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ import { styles } from "./styles";
 import { CapturedPhoto } from "../database/types";
 import { PhotoRepository } from "../database/photoRepository";
 import { initializeDatabase } from "../database/database";
+import { formatDate } from "../utils/dateUtils";
 
 
 
@@ -72,19 +74,6 @@ const [pendingPhoto, setPendingPhoto] = useState<{
       console.log(error);
       Alert.alert("Error", "Failed to delete photo");
     }
-  };
-
-  const formatDate = (isoDate: string) => {
-    const date = new Date(isoDate);
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-
-    const hours = String(date.getHours()).padStart(2, "0");
-    const mins = String(date.getMinutes()).padStart(2, "0");
-
-    return `${day}/${month}/${year} ${hours}:${mins}`;
   };
 
   if (!permission) {
@@ -161,6 +150,29 @@ const [pendingPhoto, setPendingPhoto] = useState<{
     setShowLabelModal(false);
   };
 
+
+  const renderCaptureItem : ListRenderItem<CapturedPhoto>= ({item}) =>{
+    
+    return(
+      <View style={styles.photoItem}>
+      <Image source={{ uri: item.localPath }} style={styles.thumbnail} />
+
+      <View style={styles.photoInfo}>
+        <Text style={styles.labelText}>{item.label}</Text>
+
+        <Text style={styles.dateText}>{formatDate(item.capturedAt)}</Text>
+      </View>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => deletePhoto(item.id)}
+      >
+        <Text style={styles.deleteButtonText}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -170,24 +182,7 @@ const [pendingPhoto, setPendingPhoto] = useState<{
         data={photos}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
-        renderItem={({ item }) => (
-          <View style={styles.photoItem}>
-            <Image source={{ uri: item.localPath }} style={styles.thumbnail} />
-
-            <View style={styles.photoInfo}>
-              <Text style={styles.labelText}>{item.label}</Text>
-
-              <Text style={styles.dateText}>{formatDate(item.capturedAt)}</Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => deletePhoto(item.id)}
-            >
-              <Text style={styles.deleteButtonText}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        renderItem={renderCaptureItem}
       />
 
       <TouchableOpacity style={styles.fab} onPress={() => setShowCamera(true)}>
