@@ -4,6 +4,9 @@ Capture Image with Camare & show List
 
 A React Native Expo application that allows field agents to capture photos, add labels, and store them locally for offline access.
 
+<img width="450" height="1000" alt="Screenshot_20260622_184441_Expo Go" src="https://github.com/user-attachments/assets/6d95f89a-3065-402f-8d74-a5b65a64cea6" />
+
+
 
 ## Features
 
